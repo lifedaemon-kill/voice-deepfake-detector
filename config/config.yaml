@@ -1,5 +1,8 @@
+env: dev    # prod / dev
+
 bot:
   token:
 
 app:
   ai_service_host: "localhost:8090"
+
