@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/cockroachdb/errors"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"main/internal/bot"
 	"main/internal/pkg/logger"
@@ -30,7 +31,10 @@ func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update, bot *bot.Bot, zlog 
 		// audioPath = bot.GetFileFromVideo()
 	}
 
-	predict := h.ai.GetPredict(audioPath)
+	predict, err := h.ai.GetPredict(audioPath)
+	if err != nil {
+		return errors.Wrap(err, "GetPredict")
+	}
 
 	bot.SendMessage(chatID, predict.ToString())
 	zlog.Infow("update", "chatID", chatID)
