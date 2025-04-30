@@ -4,5 +4,5 @@ bot:
   token:
 
 app:
-  ai_service_host: "localhost:8090"
-
+  anti_spoofing_host: "localhost:8090"
+  anti_audio_spoofing_endpoint: "/predict"
