@@ -10,10 +10,10 @@
 
 ---
 
-### 2. `DavidCombei/wavLM-base-Deepfake_V2`
+### 2. `mo-thecreator/Deepfake-audio-detection`
 
-Заявленная точность: `0.9962`
+Заявленная точность: `0.9882`
 
-Лицензия: `MIT`
+Лицензия: `Apache License 2.0`
 
-Источник: `https://huggingface.co/DavidCombei/wavLM-base-Deepfake_V2`
+Источник: `https://huggingface.co/mo-thecreator/Deepfake-audio-detection`
