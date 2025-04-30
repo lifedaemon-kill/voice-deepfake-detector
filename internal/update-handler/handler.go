@@ -1,25 +1,48 @@
-package command_handler
+package update_handler
 
 import (
+	"context"
 	"github.com/cockroachdb/errors"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	anti_spoof_client "main/internal/anti-spoof-client"
+	antispoofclient "main/internal/anti-spoof-client"
 	"main/internal/bot"
 	"main/internal/pkg/logger"
 )
 
 type UpdateHandler struct {
-	bot  bot.Bot
-	ai   anti_spoof_client.Service
-	zLog logger.Logger
+	bot    *bot.Bot
+	client *antispoofclient.Client
+	zLog   logger.Logger
 }
 
-func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update, bot *bot.Bot, zlog logger.Logger) error {
+func New(bot *bot.Bot, client *antispoofclient.Client, zLog logger.Logger) *UpdateHandler {
+	return &UpdateHandler{
+		bot:    bot,
+		client: client,
+		zLog:   zLog,
+	}
+}
+func (h *UpdateHandler) Run(ctx context.Context) error {
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		default:
+			for update := range h.bot.GetUpdateChan() {
+				if err := h.HandleUpdate(update); err != nil {
+					return errors.Wrap(err, "handler.HandleUpdate")
+				}
+			}
+		}
+	}
+}
+
+func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update) error {
 	chatID := update.Message.Chat.ID
 	message := update.Message.Text
 
 	if message != "" {
-		bot.SendMessage(chatID, "я работаю только с медиа-контентом, не отправляйте сообщения")
+		h.bot.SendMessage(chatID, "я работаю только с аудио-контентом, не отправляйте сообщения")
 	}
 	var audioPath string
 
@@ -31,12 +54,12 @@ func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update, bot *bot.Bot, zlog 
 		// audioPath = bot.GetFileFromVideo()
 	}
 
-	predict, err := h.ai.GetPredict(audioPath)
+	predict, err := h.client.SendRequest(audioPath)
 	if err != nil {
 		return errors.Wrap(err, "GetPredict")
 	}
 
-	bot.SendMessage(chatID, predict.ToString())
-	zlog.Infow("update", "chatID", chatID)
+	h.bot.SendMessage(chatID, predict.ToString())
+	h.zLog.Infow("update", "chatID", chatID)
 	return nil
 }
