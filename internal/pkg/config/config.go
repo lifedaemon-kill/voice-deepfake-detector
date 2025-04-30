@@ -6,7 +6,8 @@ import (
 	"os"
 )
 
-const Path = "config/config.yaml"
+const ConfigPath = "config/config.yaml"
+const AudioTempDir = "temp-audio"
 
 type Config struct {
 	Bot BotConfig `yaml:"bot"`
@@ -15,7 +16,7 @@ type Config struct {
 }
 
 type BotConfig struct {
-	Token string `yaml:"token"`
+	Token string `yaml:"token" required:"true"`
 }
 type AppConfig struct {
 	ASHost      string `yaml:"anti_spoofing_host"`
