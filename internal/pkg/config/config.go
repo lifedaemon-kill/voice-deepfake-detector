@@ -18,7 +18,8 @@ type BotConfig struct {
 	Token string `yaml:"token"`
 }
 type AppConfig struct {
-	AiServiceHost string `yaml:"ai_service_host"`
+	ASHost      string `yaml:"anti_spoofing_host"`
+	AASEndpoint string `yaml:"anti_audio_spoofing_endpoint"`
 }
 
 func Load(configPath string) (*Config, error) {
