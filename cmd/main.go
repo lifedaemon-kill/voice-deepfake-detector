@@ -26,33 +26,46 @@ func main() {
 }
 
 func bootstrap(ctx context.Context) error {
+	//1. Глобальный контекст
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	conf, err := config.Load(config.Path)
+	//2. Загрузка конфига
+	conf, err := config.Load(config.ConfigPath)
 	if err != nil {
 		return errors.Wrap(err, "config.Load")
 	}
 
+	//3. Создание логгера
 	zLog, err := logger.New(conf.Env)
 	if err != nil {
 		return errors.Wrap(err, "logger.New")
 	}
 	zLog.Infow("Logger and config initialized successfully")
 
+	//4. Инициализация бота
 	botExecutor, err := bot.New(conf.Bot, conf.Env, &zLog)
 	if err != nil {
 		return errors.Wrap(err, "New")
 	}
 
+	//5. Созадние http клиента для использования внешнего апи с моделями
 	client := anti_spoof_client.NewClient(conf.App)
 
+	//6. Инициализация обработчика обновлений телеграм чатов
 	updateHandler := update_handler.New(botExecutor, client, zLog)
 
-	if err = updateHandler.Run(ctx); err != nil {
-		return err
+	//7. Создаем директорию для временных аудио файлов
+	if err = os.MkdirAll(config.AudioTempDir, os.ModePerm); err != nil {
+		return errors.Wrap(err, "mkdir")
 	}
 
+	//8. Запуск обработки обновлений
+	if err = updateHandler.Run(ctx); err != nil {
+		return errors.Wrap(err, "updateHandler.Run")
+	}
+
+	//9. Ожидание завершения контекста
 	<-ctx.Done()
 
 	zLog.Infow("Application shutting down...")
