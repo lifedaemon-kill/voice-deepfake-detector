@@ -1,16 +1,16 @@
-package handler
+package command_handler
 
 import (
 	"github.com/cockroachdb/errors"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	anti_spoof_client "main/internal/anti-spoof-client"
 	"main/internal/bot"
 	"main/internal/pkg/logger"
-	"main/internal/service/ai"
 )
 
 type UpdateHandler struct {
 	bot  bot.Bot
-	ai   ai.Service
+	ai   anti_spoof_client.Service
 	zLog logger.Logger
 }
 

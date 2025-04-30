@@ -1,4 +1,4 @@
-package ai
+package anti_spoof_client
 
 import (
 	"encoding/json"
@@ -26,7 +26,7 @@ type Service struct {
 	url    string
 }
 
-// Принимает на вход путь до wav файла и отправляет grpc запрос к python api
+// Принимает на вход путь до wav файла и отправляет grpc запрос к external-api api
 func (s *Service) GetPredict(path string) (*Predict, error) {
 	//s.client
 	// Создаём новый http-клиент и запрос
