@@ -16,7 +16,7 @@ type Bot struct {
 func New(conf config.BotConfig, env string, log *logger.Logger) (*Bot, error) {
 	bot, err := tgbotapi.NewBotAPI(conf.Token)
 	if err != nil {
-		return nil, errors.Wrap(err, "New")
+		return nil, errors.Wrap(err, "tgbotapi.NewBotAPI")
 	}
 	if env == "prod" {
 		bot.Debug = false
@@ -48,5 +48,38 @@ func (b *Bot) GetFileFromVoice(voice tgbotapi.Voice) *bytes.Buffer {
 
 	//}
 
+	return nil
+}
+
+func (b *Bot) SendHelpMessage(chatID int64) error {
+	msg := tgbotapi.NewMessage(chatID, "Это бот для анализа спуфинга аудио файлов и голосовых сообщений")
+	b.bot.Send(msg)
+	return nil
+}
+
+func (b *Bot) SendLicenceMessage(chatID int64) error {
+	licence := `
+### Модели распознавания спуфинга аудио:
+
+### 1. MelodyMachine/Deepfake-audio-detection-V2
+
+Заявленная точность: 0.9973
+
+Лицензия: Apache License 2.0
+
+Источник: https://huggingface.co/MelodyMachine/Deepfake-audio-detection-V2
+
+---
+
+### 2. DavidCombei/wavLM-base-Deepfake_V2
+
+Заявленная точность: 0.9962
+
+Лицензия: MIT
+
+Источник: https://huggingface.co/DavidCombei/wavLM-base-Deepfake_V2
+`
+	msg := tgbotapi.NewMessage(chatID, licence)
+	b.bot.Send(msg)
 	return nil
 }
