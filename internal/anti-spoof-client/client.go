@@ -1,66 +1,47 @@
 package anti_spoof_client
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/cockroachdb/errors"
-	"io"
+	"main/internal/pkg/config"
+	"main/internal/pkg/models"
 	"net/http"
 )
 
-type Predict struct {
-	//модель 1 например
-	res1 string
-	//модель 2 например
-	res2 string
-	//Итоговый ответ, считаться может по формуле
-	ans bool
+type Client struct {
+	Host              string
+	AntiSpoofEndpoint string
 }
 
-func (p *Predict) ToString() string {
-	return fmt.Sprintf("model1: %s\nmodel2: %s\nresult:%v", p.res1, p.res2, p.ans)
+func NewClient(config config.AppConfig) *Client {
+	return &Client{
+		Host:              config.ASHost,
+		AntiSpoofEndpoint: config.AASEndpoint,
+	}
 }
-
-type Service struct {
-	client http.Client
-	url    string
-}
-
-// Принимает на вход путь до wav файла и отправляет grpc запрос к external-api api
-func (s *Service) GetPredict(path string) (*Predict, error) {
-	//s.client
-	// Создаём новый http-клиент и запрос
-	req, err := http.NewRequest("GET", s.url, nil)
+func (c *Client) SendRequest(filePath string) (*models.AntiSpoofingResponse, error) {
+	requestBody, err := json.Marshal(map[string]string{"file_path": filePath})
 	if err != nil {
-		return nil, errors.Wrap(err, "http.NewRequest")
+		return nil, fmt.Errorf("ошибка при маршализации JSON: %v", err)
 	}
 
-	// Добавляем строковую переменную в заголовке (например, X-My-Variable)
-	req.Header.Set("X-Audio-Path", path)
-
-	// Выполняем запрос
-	resp, err := s.client.Do(req)
+	resp, err := http.Post(c.Host+c.AntiSpoofEndpoint, "application/json", bytes.NewBuffer(requestBody))
 	if err != nil {
-		return nil, errors.Wrap(err, "client.Do")
+		return nil, fmt.Errorf("ошибка при отправке запроса: %v", err)
 	}
 	defer resp.Body.Close()
 
-	// Читаем тело ответа
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "io.ReadAll")
+	// Проверяем статус ответа
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("неожиданный статус ответа: %s", resp.Status)
 	}
 
-	// Выводим полученный ответ как текст
-	fmt.Println("Ответ сервера (raw):")
-	fmt.Println(string(body))
-
-	// Если сервер возвращает JSON, парсим его
-	var prediction Predict
-	err = json.Unmarshal(body, &prediction)
-	if err != nil {
-		return nil, errors.Wrap(err, "json.Unmarshal")
+	// Декодируем JSON-ответ
+	var response models.AntiSpoofingResponse
+	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, fmt.Errorf("ошибка при декодировании JSON: %v", err)
 	}
 
-	return &prediction, nil
+	return &response, nil
 }
