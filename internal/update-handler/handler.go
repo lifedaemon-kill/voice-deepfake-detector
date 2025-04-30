@@ -41,25 +41,35 @@ func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update) error {
 	chatID := update.Message.Chat.ID
 	message := update.Message.Text
 
-	if message != "" {
-		h.bot.SendMessage(chatID, "я работаю только с аудио-контентом, не отправляйте сообщения")
+	if message == "/help" || message == "/start" {
+		h.bot.SendHelpMessage(chatID)
+		return nil
+	} else if message == "/licence" {
+		h.bot.SendLicenceMessage(chatID)
+		return nil
 	}
+
+	if message != "" {
+		h.bot.SendMessage(chatID, "я работаю только с аудио-контентом")
+		return nil
+	}
+
 	var audioPath string
 
-	if update.Message.Voice != nil {
-		//audioPath = bot.GetFileFromVoice()
-	} else if update.Message.Audio != nil {
-		// audioPath = bot.GetFileFromAudio
-	} else if update.Message.Video != nil {
-		// audioPath = bot.GetFileFromVideo()
-	}
+	if update.Message.Voice != nil || update.Message.Audio != nil {
+		h.bot.SendMessage(chatID, "Обработка аудио началась")
+		audioPath = "D:/Projects/ai-detector/external-api/tests/real/audio_2025-04-30_09-41-30.ogg"
 
-	predict, err := h.client.SendRequest(audioPath)
-	if err != nil {
-		return errors.Wrap(err, "GetPredict")
-	}
+		predict, err := h.client.SendRequest(audioPath)
+		if err != nil {
+			return errors.Wrap(err, "GetPredict")
+		}
 
-	h.bot.SendMessage(chatID, predict.ToString())
-	h.zLog.Infow("update", "chatID", chatID)
+		h.bot.SendMessage(chatID, predict.ToString())
+		h.zLog.Infow("update", "chatID", chatID)
+		return nil
+	}
+	h.bot.SendMessage(chatID, "С данным типом файлов не умею работать, смотрите /help")
 	return nil
+
 }
