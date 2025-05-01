@@ -1,21 +1,29 @@
 services:
-  go_service:
+  go-service:
     build:
-      context: .
-      dockerfile: go/build/Dockerfile
-    volumes:
-      - shared-data:/data
-    depends_on:
-      - python_service
-
-  python_service:
-    build:
-      context: ./external-api
+      context: ./go
       dockerfile: build/Dockerfile
+    volumes:
+      - temp-audio:/app/temp-audio
+    networks:
+      - ai-detector-network
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}  # Переменная среды или напрямую
+
+  python-service:
+    build:
+      context: ./python
+      dockerfile: build/Dockerfile
+    volumes:
+      - temp-audio:/app/temp-audio
+    networks:
+      - ai-detector-network
     ports:
       - "8090:8090"
-    volumes:
-      - shared-data:/data
+
+networks:
+  ai-detector-network:
+    driver: bridge
 
 volumes:
-  shared-data:
+  temp-audio:
