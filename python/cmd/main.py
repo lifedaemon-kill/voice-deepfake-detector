@@ -1,12 +1,11 @@
+import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import uvicorn
-
 from starlette.responses import JSONResponse
 from transformers import pipeline
 
 # Загрузка модели мелоди в пайплайн
-predict1 = pipeline("audio-classification", model="pretrained_models/MelodyMachine")
+predict1 = pipeline("audio-classification", model="../pretrained_models/MelodyMachine")
 
 predict2 = pipeline("audio-classification", model="mo-thecreator/Deepfake-audio-detection")
 
@@ -54,4 +53,4 @@ async def predict(request: AudioPathRequest):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=8090, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8090, reload=True)
