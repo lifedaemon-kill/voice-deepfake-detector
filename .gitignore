@@ -3,6 +3,6 @@
 go/.idea
 python/.idea
 
-config/config.yaml
+go/config/config.yaml
 
 temp-audio/

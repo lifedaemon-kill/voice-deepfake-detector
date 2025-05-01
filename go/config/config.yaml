@@ -1,7 +1,5 @@
 env: dev    # prod / dev
 
-bot:
-  token:
 app:
   anti_spoofing_host: "http://127.0.0.1:8090"
   anti_audio_spoofing_endpoint: "/predict"

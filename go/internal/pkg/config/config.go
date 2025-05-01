@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-const ConfigPath = "config/config.yaml"
+const ConfigPath = "../config/config.yaml"
 
 type Config struct {
 	Bot BotConfig `yaml:"bot"`
@@ -15,7 +15,7 @@ type Config struct {
 }
 
 type BotConfig struct {
-	Token string `yaml:"token" required:"true"`
+	Token string
 }
 type AppConfig struct {
 	ASHost       string `yaml:"anti_spoofing_host"`
@@ -34,5 +34,7 @@ func Load(configPath string) (*Config, error) {
 	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
 		return nil, errors.Wrap(err, "failed to read config")
 	}
+
+	cfg.Bot.Token = os.Getenv("BOT_TOKEN")
 	return &cfg, nil
 }
