@@ -7,7 +7,6 @@ import (
 )
 
 const ConfigPath = "config/config.yaml"
-const AudioTempDir = "temp-audio"
 
 type Config struct {
 	Bot BotConfig `yaml:"bot"`
@@ -19,8 +18,9 @@ type BotConfig struct {
 	Token string `yaml:"token" required:"true"`
 }
 type AppConfig struct {
-	ASHost      string `yaml:"anti_spoofing_host"`
-	AASEndpoint string `yaml:"anti_audio_spoofing_endpoint"`
+	ASHost       string `yaml:"anti_spoofing_host"`
+	AASEndpoint  string `yaml:"anti_audio_spoofing_endpoint"`
+	AudioTempDir string `yaml:"temp_audio_dir"`
 }
 
 func Load(configPath string) (*Config, error) {

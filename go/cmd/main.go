@@ -4,11 +4,11 @@ import (
 	"context"
 	"github.com/cockroachdb/errors"
 	"log"
-	anti_spoof_client "main/internal/anti-spoof-client"
+	"main/internal/anti-spoof-client"
 	"main/internal/bot"
 	"main/internal/pkg/config"
 	"main/internal/pkg/logger"
-	update_handler "main/internal/update-handler"
+	"main/internal/update-handler"
 	"os"
 	"time"
 )
@@ -52,13 +52,13 @@ func bootstrap(ctx context.Context) error {
 	//5. Созадние http клиента для использования внешнего апи с моделями
 	client := anti_spoof_client.NewClient(conf.App)
 
-	//6. Инициализация обработчика обновлений телеграм чатов
-	updateHandler := update_handler.New(botExecutor, client, zLog)
-
-	//7. Создаем директорию для временных аудио файлов
-	if err = os.MkdirAll(config.AudioTempDir, os.ModePerm); err != nil {
+	//6. Создаем директорию для временных аудио файлов
+	if err = os.MkdirAll(conf.App.AudioTempDir, os.ModePerm); err != nil {
 		return errors.Wrap(err, "mkdir")
 	}
+
+	//7. Инициализация обработчика обновлений телеграм чатов
+	updateHandler := update_handler.New(botExecutor, client, conf.App.AudioTempDir, zLog)
 
 	//8. Запуск обработки обновлений
 	if err = updateHandler.Run(ctx); err != nil {
