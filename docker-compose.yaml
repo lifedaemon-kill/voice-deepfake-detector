@@ -1,0 +1,21 @@
+services:
+  go_service:
+    build:
+      context: .
+      dockerfile: go/build/Dockerfile
+    volumes:
+      - shared-data:/data
+    depends_on:
+      - python_service
+
+  python_service:
+    build:
+      context: ./external-api
+      dockerfile: build/Dockerfile
+    ports:
+      - "8090:8090"
+    volumes:
+      - shared-data:/data
+
+volumes:
+  shared-data:
