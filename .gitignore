@@ -1,4 +1,8 @@
 .idea
-external-api/.idea
+
+go/.idea
+python/.idea
 
 config/config.yaml
+
+temp-audio/
