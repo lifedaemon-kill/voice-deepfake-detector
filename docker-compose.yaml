@@ -8,7 +8,9 @@ services:
     networks:
       - ai-detector-network
     environment:
-      - BOT_TOKEN=${BOT_TOKEN}  # Переменная среды или напрямую
+      - BOT_TOKEN=
+    depends_on:
+      - python-service
 
   python-service:
     build:
