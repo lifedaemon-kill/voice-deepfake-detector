@@ -44,7 +44,7 @@ func (h *UpdateHandler) Run(ctx context.Context) error {
 func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update) error {
 	chatID := update.Message.Chat.ID
 	message := update.Message.Text
-	h.zLog.Infow("handle update", "msg", update.Message)
+	h.zLog.Infow("handle update", "chatID", update.Message.Chat.ID, "user", update.Message.From.UserName, "mimetype", update.Message.Chat.Type)
 
 	if message == "/help" || message == "/start" {
 		err := h.bot.SendHelpMessage(chatID)
@@ -57,7 +57,7 @@ func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update) error {
 	}
 
 	if message != "" {
-		err := h.bot.SendMessage(chatID, "я работаю только с аудио-контентом")
+		err := h.bot.SendMessage(chatID, "Я работаю только с аудио-контентом")
 		h.zLog.Infow("send message", "msg", update.Message, "err", err)
 		return nil
 	}
@@ -92,11 +92,11 @@ func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update) error {
 		return errors.Wrap(err, "DownloadFile")
 	}
 
-	h.bot.SendMessage(chatID, "Запуск моделей")
+	h.bot.SendMessage(chatID, "Расчеты моделей...")
 	predict, err := h.client.SendRequest(audioPath)
 	if err != nil {
-		h.bot.SendMessage(chatID, "Ошибка при запуске моделей")
-		return errors.Wrap(err, "GetPredict")
+		h.bot.SendMessage(chatID, "Ошибка во время работы моделей")
+		return errors.New("[client.SendRequest] " + err.Error())
 	}
 
 	h.bot.SendMessage(chatID, predict.ToString(filename))

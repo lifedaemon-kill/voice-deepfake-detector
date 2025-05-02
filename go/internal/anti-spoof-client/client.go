@@ -35,7 +35,7 @@ func (c *Client) SendRequest(filePath string) (*models.AntiSpoofingResponse, err
 
 	// Проверяем статус ответа
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New("неожиданный статус ответа: " + resp.Status + "; body: " + string(requestBody) + "; endpoint: " + c.Host + c.AntiSpoofEndpoint)
+		return nil, errors.New("неожиданный статус ответа: " + resp.Status + "; body: " + string(requestBody) + "; endpoint: " + c.Host + c.AntiSpoofEndpoint + ";")
 	}
 
 	// Декодируем JSON-ответ
