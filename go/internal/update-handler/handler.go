@@ -59,30 +59,40 @@ func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update) error {
 	}
 
 	var fileID string
+	var mimetype string
+	var filename string
 	//Если пришло голосовое сообщение или аудио
 	if update.Message.Voice != nil {
 		fileID = update.Message.Voice.FileID
+		mimetype = update.Message.Voice.MimeType
+		filename = "Голосовое сообщение"
 	} else if update.Message.Audio != nil {
 		fileID = update.Message.Audio.FileID
+		mimetype = update.Message.Audio.MimeType
+		filename = update.Message.Audio.FileName
 	} else {
-		h.bot.SendMessage(chatID, "С данным типом файлов не умею работать, смотрите /help")
+		h.bot.SendMessage(chatID, "Данный тип файла не поддерживается, смотрите /help")
 		return nil
 	}
 
-	audioPath, err := h.bot.DownloadFile(fileID, h.tempAudioDir)
+	audioPath, err := h.bot.DownloadFile(fileID, mimetype, h.tempAudioDir)
+	defer func() {
+		h.zLog.Infow("Удаление файла " + audioPath)
+		os.Remove(audioPath)
+
+		h.zLog.Infow("Файл удалён " + audioPath)
+	}()
 	if err != nil {
 		h.bot.SendMessage(chatID, "Произошла ошибка при обработке файла, попробуйте еще или напишите на почту об ошибке")
 		return errors.Wrap(err, "DownloadFile")
 	}
-	defer os.Remove(audioPath)
 
 	predict, err := h.client.SendRequest(audioPath)
 	if err != nil {
 		return errors.Wrap(err, "GetPredict")
 	}
 
-	h.bot.SendMessage(chatID, predict.ToString())
+	h.bot.SendMessage(chatID, predict.ToString(filename))
 	h.zLog.Infow("update", "chatID", chatID)
 	return nil
-
 }
