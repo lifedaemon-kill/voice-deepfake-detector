@@ -1,4 +1,4 @@
-env: dev    # prod / dev
+env: prod    # prod / dev
 
 app:
   anti_spoofing_host: "http://127.0.0.1:8090"
