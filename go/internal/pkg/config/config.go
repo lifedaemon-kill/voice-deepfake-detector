@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-const ConfigPath = "../config/config.yaml"
+const ConfigPath = "config/config.yaml"
 
 type Config struct {
 	Bot BotConfig `yaml:"bot"`
