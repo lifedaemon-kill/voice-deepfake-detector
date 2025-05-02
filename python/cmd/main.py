@@ -5,9 +5,9 @@ from starlette.responses import JSONResponse
 from transformers import pipeline
 
 # Загрузка модели мелоди в пайплайн
-predict1 = pipeline("audio-classification", model="../pretrained_models/MelodyMachine")
+predict1 = pipeline("audio-classification", model="pretrained_models/melody-machine")
 
-predict2 = pipeline("audio-classification", model="mo-thecreator/Deepfake-audio-detection")
+predict2 = pipeline("audio-classification", model="pretrained_models/mo-the-creator")
 
 app = FastAPI()
 
@@ -53,4 +53,4 @@ async def predict(request: AudioPathRequest):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8090, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8090, reload=False)
