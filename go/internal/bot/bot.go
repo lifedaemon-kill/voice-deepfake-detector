@@ -27,8 +27,6 @@ func New(conf config.BotConfig, env string, log *logger.Logger) (*Bot, error) {
 	} else {
 		bot.Debug = true
 	}
-	//TODO убрать
-	//bot.Debug = false
 
 	return &Bot{
 		bot:  bot,
@@ -60,7 +58,7 @@ func (b *Bot) SendLicenceMessage(chatID int64) error {
 }
 
 // DownloadFile возвращает путь до скачанного файла
-func (b *Bot) DownloadFile(fileID, filePath string) (string, error) {
+func (b *Bot) DownloadFile(fileID, mimetype, filePath string) (string, error) {
 	file, err := b.bot.GetFile(tgbotapi.FileConfig{FileID: fileID})
 	if err != nil {
 		return "", errors.Wrap(err, "tgbotapi.GetFile")
@@ -77,21 +75,21 @@ func (b *Bot) DownloadFile(fileID, filePath string) (string, error) {
 	}
 	defer response.Body.Close()
 
-	contentType := response.Header.Get("Content-Type")
 	var extension string
-	switch contentType {
+	switch mimetype {
 	case "audio/mpeg":
 		extension = ".mp3"
-	case "audio/ogg", "application/octet-stream":
+	case "audio/ogg":
 		extension = ".ogg"
 	case "audio/wav":
 		extension = ".wav"
 	default:
-		return "", errors.New("unsupported file type: " + contentType)
+		return "", errors.New("unsupported file type: " + extension)
 	}
-	//Создание файла
+
 	audioPath := filePath + uuid.New().String() + extension
 	out, err := os.Create(audioPath)
+	defer out.Close()
 	if err != nil {
 		return "", errors.Wrap(err, "os.Create")
 	}
