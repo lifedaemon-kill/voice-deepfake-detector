@@ -1,6 +1,6 @@
 env: prod    # prod / dev
 
 app:
-  anti_spoofing_host: "http://python-service:8090"
+  anti_spoofing_host: "http://fastapi:8090"
   anti_audio_spoofing_endpoint: "/predict"
   temp_audio_dir : "../temp-audio/"

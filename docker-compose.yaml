@@ -4,24 +4,24 @@ services:
       context: ./go
       dockerfile: build/Dockerfile
     volumes:
-      - temp-audio:/app/temp-audio
+      - temp-audio:/temp-audio
     networks:
       - ai-detector-network
     environment:
-      - BOT_TOKEN=
+      BOT_TOKEN: "7294621562:AAE9AG13GiZFms57CvV6fDMhwqb8LYMzsv8"
     depends_on:
-      - python-service
+      - fastapi
 
-  python-service:
+  fastapi:
     build:
       context: ./python
       dockerfile: build/Dockerfile
     volumes:
-      - temp-audio:/app/temp-audio
+      - temp-audio:/temp-audio
     networks:
       - ai-detector-network
-    ports:
-      - "8090:8090"
+  #  ports:
+  #    - "8090:8090"
 
 networks:
   ai-detector-network:
