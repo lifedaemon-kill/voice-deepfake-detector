@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/cockroachdb/errors"
 	"main/internal/pkg/config"
 	"main/internal/pkg/models"
 	"net/http"
@@ -34,7 +35,7 @@ func (c *Client) SendRequest(filePath string) (*models.AntiSpoofingResponse, err
 
 	// Проверяем статус ответа
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("неожиданный статус ответа: %s", resp.Status)
+		return nil, errors.New("неожиданный статус ответа: " + resp.Status + "; body: " + string(requestBody) + "; endpoint: " + c.Host + c.AntiSpoofEndpoint)
 	}
 
 	// Декодируем JSON-ответ
@@ -42,6 +43,6 @@ func (c *Client) SendRequest(filePath string) (*models.AntiSpoofingResponse, err
 	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return nil, fmt.Errorf("ошибка при декодировании JSON: %v", err)
 	}
-
+	fmt.Println(response)
 	return &response, nil
 }

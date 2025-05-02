@@ -36,5 +36,9 @@ func Load(configPath string) (*Config, error) {
 	}
 
 	cfg.Bot.Token = os.Getenv("BOT_TOKEN")
+
+	if cfg.Bot.Token == "" {
+		return nil, errors.New("BOT_TOKEN is not set")
+	}
 	return &cfg, nil
 }

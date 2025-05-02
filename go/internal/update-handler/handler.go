@@ -34,7 +34,7 @@ func (h *UpdateHandler) Run(ctx context.Context) error {
 		default:
 			for update := range h.bot.GetUpdateChan() {
 				if err := h.HandleUpdate(update); err != nil {
-					return errors.Wrap(err, "handler.HandleUpdate")
+					h.zLog.Errorw("handler.HandleUpdate", "err", err)
 				}
 			}
 		}
@@ -44,24 +44,28 @@ func (h *UpdateHandler) Run(ctx context.Context) error {
 func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update) error {
 	chatID := update.Message.Chat.ID
 	message := update.Message.Text
+	h.zLog.Infow("handle update", "msg", update.Message)
 
 	if message == "/help" || message == "/start" {
-		h.bot.SendHelpMessage(chatID)
+		err := h.bot.SendHelpMessage(chatID)
+		h.zLog.Infow("send help", "err", err)
 		return nil
 	} else if message == "/licence" {
-		h.bot.SendLicenceMessage(chatID)
+		err := h.bot.SendLicenceMessage(chatID)
+		h.zLog.Infow("send licence", "err", err)
 		return nil
 	}
 
 	if message != "" {
-		h.bot.SendMessage(chatID, "я работаю только с аудио-контентом")
+		err := h.bot.SendMessage(chatID, "я работаю только с аудио-контентом")
+		h.zLog.Infow("send message", "msg", update.Message, "err", err)
 		return nil
 	}
 
 	var fileID string
 	var mimetype string
 	var filename string
-	//Если пришло голосовое сообщение или аудио
+
 	if update.Message.Voice != nil {
 		fileID = update.Message.Voice.FileID
 		mimetype = update.Message.Voice.MimeType
@@ -71,24 +75,27 @@ func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update) error {
 		mimetype = update.Message.Audio.MimeType
 		filename = update.Message.Audio.FileName
 	} else {
-		h.bot.SendMessage(chatID, "Данный тип файла не поддерживается, смотрите /help")
+		err := h.bot.SendMessage(chatID, "Данный тип файла не поддерживается, смотрите /help")
+		h.zLog.Infow("Unsupported filetype", "err", err)
 		return nil
 	}
 
+	h.bot.SendMessage(chatID, "Обработка файла началась")
 	audioPath, err := h.bot.DownloadFile(fileID, mimetype, h.tempAudioDir)
 	defer func() {
 		h.zLog.Infow("Удаление файла " + audioPath)
 		os.Remove(audioPath)
-
 		h.zLog.Infow("Файл удалён " + audioPath)
 	}()
 	if err != nil {
-		h.bot.SendMessage(chatID, "Произошла ошибка при обработке файла, попробуйте еще или напишите на почту об ошибке")
+		h.bot.SendMessage(chatID, "Произошла ошибка при обработке файла")
 		return errors.Wrap(err, "DownloadFile")
 	}
 
+	h.bot.SendMessage(chatID, "Запуск моделей")
 	predict, err := h.client.SendRequest(audioPath)
 	if err != nil {
+		h.bot.SendMessage(chatID, "Ошибка при запуске моделей")
 		return errors.Wrap(err, "GetPredict")
 	}
 
