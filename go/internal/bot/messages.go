@@ -3,12 +3,12 @@ package bot
 const licence = `
 Модели распознавания спуфинга аудио:
 
-м1: MelodyMachine/Deepfake-audio-detection-V2
+m1: MelodyMachine/Deepfake-audio-detection-V2
 Заявленная точность: 0.9973
 Лицензия: Apache License 2.0
 Источник: https://huggingface.co/MelodyMachine/Deepfake-audio-detection-V2
 -----------------------------------------
-м2: mo-thecreator/Deepfake-audio-detection
+m2: mo-thecreator/Deepfake-audio-detection
 Заявленная точность: 0.9882
 Лицензия: Apache License 2.0
 Источник: https://huggingface.co/mo-thecreator/Deepfake-audio-detection
@@ -18,12 +18,25 @@ Apache License 2.0:
 `
 
 const help = `
-Бот специализируется на распознавании подделки голоса (voice spoofing / deepfake)
+Бот специализируется на распознавании подделки голоса 
+(voice spoofing / deepfake)
+------------------------------------
 Поддерживаются:
 - Голосовые сообщения
-- Файлы .ogg, .mp3
-
+- Файлы .ogg .mp3 .wav
+------------------------------------
 Команды:
-/help - Показать это сообщение
-/licence - Показать лицензии используемого ПО
+/help - Вывод этого сообщения
+/licence - Вывод лицензий используемого ПО
+------------------------------------
+Термины:
+m1, m2 - см. /licence
+
+Avg (average) - среднее значение, которое дали модели
+
+wAvg (weighted average) - взвешенное среднее, которое отдает большее предпочтение модели 1, ввиду ее большей точности
+
+Спуфинг (англ. Spoofing - подмена) - Вид атаки, когда человек или программа маскируется под другого, путем фальсификации голоса
+
+Deepfake - Созданная программно симуляция голоса
 `

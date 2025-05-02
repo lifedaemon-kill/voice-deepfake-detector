@@ -15,14 +15,14 @@ func (p *AntiSpoofingResponse) WeightedAverage() float64 {
 func (p *AntiSpoofingResponse) Predict() string {
 	threshold := 0.7
 	if p.WeightedAverage() > threshold {
-		return "Аудио подделано"
+		return "Аудио подделано или модифицировано"
 	} else {
 		return "Аудио настоящее"
 	}
 }
 
-func (p *AntiSpoofingResponse) ToString() string {
+func (p *AntiSpoofingResponse) ToString(filename string) string {
 	return fmt.Sprintf(
-		"Вероятность спуфинга:\n\tмодель MelodyMachine: %f\n\tмодель mo-thecreator: %f\nСреднее значение: %f\nВзвешенное значение: %f\n\nЗаключение: %v",
+		filename+"\nВероятность спуфинга:\n\tm1: %f\n\tm2: %f\n Avg: %f\nwAvg: %f\n\nЗаключение: %v",
 		p.MelodyMachine, p.MoTheCreator, (p.MelodyMachine+p.MoTheCreator)/2, p.WeightedAverage(), p.Predict())
 }
