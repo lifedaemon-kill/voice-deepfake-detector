@@ -29,7 +29,7 @@ func (c *Client) SendRequest(filePath string) (*models.AntiSpoofingResponse, err
 
 	resp, err := http.Post(c.Host+c.AntiSpoofEndpoint, "application/json", bytes.NewBuffer(requestBody))
 	if err != nil {
-		return nil, fmt.Errorf("ошибка при отправке запроса: %v", err)
+		return nil, errors.Wrap(err, "ошибка при отправке запроса")
 	}
 	defer resp.Body.Close()
 
@@ -43,6 +43,6 @@ func (c *Client) SendRequest(filePath string) (*models.AntiSpoofingResponse, err
 	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return nil, fmt.Errorf("ошибка при декодировании JSON: %v", err)
 	}
-	fmt.Println(response)
+
 	return &response, nil
 }
