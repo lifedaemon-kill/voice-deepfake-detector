@@ -8,9 +8,10 @@ services:
     networks:
       - ai-detector-network
     environment:
-      BOT_TOKEN: "7294621562:AAE9AG13GiZFms57CvV6fDMhwqb8LYMzsv8"
+      BOT_TOKEN: "8055448977:AAG88Qj_gPSJZiKWzx-YPTzqT9nJV6gHY_E"
     depends_on:
       - fastapi
+    #restart: always             #Автозапуск для развертывания на сервере
 
   fastapi:
     build:
@@ -20,8 +21,7 @@ services:
       - temp-audio:/temp-audio
     networks:
       - ai-detector-network
-  #  ports:
-  #    - "8090:8090"
+    #restart: always            #Автозапуск для развертывания на сервере
 
 networks:
   ai-detector-network:
