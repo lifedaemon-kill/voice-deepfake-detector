@@ -44,15 +44,15 @@ func (h *UpdateHandler) Run(ctx context.Context) error {
 func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update) error {
 	chatID := update.Message.Chat.ID
 	message := update.Message.Text
-	h.zLog.Infow("handle update", "chatID", update.Message.Chat.ID, "user", update.Message.From.UserName, "mimetype", update.Message.Chat.Type)
+	h.zLog.Infow("handle update", "chatID", update.Message.Chat.ID, "user", update.Message.From.UserName, "mimetype", update.Message)
 
 	if message == "/help" || message == "/start" {
 		err := h.bot.SendHelpMessage(chatID)
 		h.zLog.Infow("send help", "err", err)
 		return nil
-	} else if message == "/licence" {
-		err := h.bot.SendLicenceMessage(chatID)
-		h.zLog.Infow("send licence", "err", err)
+	} else if message == "/license" {
+		err := h.bot.SendLicenseMessage(chatID)
+		h.zLog.Infow("send license", "err", err)
 		return nil
 	}
 
@@ -79,9 +79,10 @@ func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update) error {
 		h.zLog.Infow("Unsupported filetype", "err", err)
 		return nil
 	}
+	h.zLog.Infow("Скачивание файла: ", "fileID", fileID, "mimetype", mimetype, "filename", filename)
 
 	h.bot.SendMessage(chatID, "Обработка файла началась")
-	audioPath, err := h.bot.DownloadFile(fileID, mimetype, h.tempAudioDir)
+	audioPath, err := h.bot.DownloadAudioFile(fileID, mimetype, h.tempAudioDir)
 	defer func() {
 		h.zLog.Infow("Удаление файла " + audioPath)
 		os.Remove(audioPath)
@@ -89,7 +90,7 @@ func (h *UpdateHandler) HandleUpdate(update tgbotapi.Update) error {
 	}()
 	if err != nil {
 		h.bot.SendMessage(chatID, "Произошла ошибка при обработке файла")
-		return errors.Wrap(err, "DownloadFile")
+		return errors.Wrap(err, "DownloadAudioFile")
 	}
 
 	h.bot.SendMessage(chatID, "Расчеты моделей...")
