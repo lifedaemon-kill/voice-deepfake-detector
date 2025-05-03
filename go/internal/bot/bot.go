@@ -51,14 +51,14 @@ func (b *Bot) SendHelpMessage(chatID int64) error {
 	return nil
 }
 
-func (b *Bot) SendLicenceMessage(chatID int64) error {
-	msg := tgbotapi.NewMessage(chatID, licence)
+func (b *Bot) SendLicenseMessage(chatID int64) error {
+	msg := tgbotapi.NewMessage(chatID, license)
 	b.bot.Send(msg)
 	return nil
 }
 
-// DownloadFile возвращает путь до скачанного файла
-func (b *Bot) DownloadFile(fileID, mimetype, filePath string) (string, error) {
+// DownloadAudioFile возвращает путь до скачанного файла
+func (b *Bot) DownloadAudioFile(fileID, mimetype, filePath string) (string, error) {
 	file, err := b.bot.GetFile(tgbotapi.FileConfig{FileID: fileID})
 	if err != nil {
 		return "", errors.Wrap(err, "tgbotapi.GetFile")
@@ -84,7 +84,7 @@ func (b *Bot) DownloadFile(fileID, mimetype, filePath string) (string, error) {
 	case "audio/wav":
 		extension = ".wav"
 	default:
-		return "", errors.New("unsupported file type: " + extension)
+		return "", errors.New("unsupported file type: " + mimetype)
 	}
 
 	audioPath := filePath + uuid.New().String() + extension
@@ -94,6 +94,7 @@ func (b *Bot) DownloadFile(fileID, mimetype, filePath string) (string, error) {
 		return "", errors.Wrap(err, "os.Create")
 	}
 	_, err = io.Copy(out, response.Body)
+	out.Close()
 
 	absolutePath, err := filepath.Abs(audioPath)
 	if err != nil {
